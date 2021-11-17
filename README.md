@@ -1,1 +1,1 @@
-https://accounts.google.com/DisplayUnlockCaptcha
+https://accounts.google.com/DisplayUnlockCaptcha = google captcha için
