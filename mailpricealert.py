@@ -48,14 +48,15 @@ def send_email(sender, receiver, sender_password, text_price):
   server.login(sender, sender_password)
   server.sendmail(sender, receiver, msg.as_string())
 
-
+coin = ""
+alarm_price = ""
 
 async def coin_price_1(coin):
     url = "wss://stream.binance.com:9443/ws/{}@miniTicker".format(coin)
 
     async with websockets.connect(url) as ws:
-            msg = await ws.recv()
-            return msg
+        msg = await ws.recv()
+        return msg
 
 async def coin_price_loop(coin):
     url = "wss://stream.binance.com:9443/ws/{}@miniTicker".format(coin)
@@ -66,67 +67,45 @@ async def coin_price_loop(coin):
             return msg
 
 
+def taking_price(coin):
+	data = asyncio.get_event_loop().run_until_complete(coin_price_loop(coin))
+	price = json.loads(data)
+	price = price["c"]
+	price = float(price)
 
 def send_alert(coin):
-  alarm_price = float(input("Price:"))
-
-  while True:
-    
-    
-    data = asyncio.get_event_loop().run_until_complete(coin_price_1(coin))
-    price = json.loads(data)
-    price = price["c"]
-    price = float(price)
-    
-    while price <= alarm_price:
-      data = asyncio.get_event_loop().run_until_complete(coin_price_loop(coin))
-      price = json.loads(data)
-      price = price["c"]
-      price = float(price)
-      
-      if price >= alarm_price:
-        print(coin.capitalize()+' price: ', price)
-        price_text = coin.capitalize()+' is '+str(price)
-        send_email(sender, receiver, sender_password, price_text)        
-        break
-    
-    while price >= alarm_price:
-      data = asyncio.get_event_loop().run_until_complete(coin_price_loop(coin))
-      price = json.loads(data)
-      price = price["c"]
-      price = float(price)
-      
-
-      if price <= alarm_price:
-        print(coin.capitalize()+' price: ', price)
-        price_text = coin.capitalize()+' is '+str(price)
-        send_email(sender, receiver, sender_password, price_text)
-        break
-    
-    break
-key = "n"
-while key == "n":
-	coin1 = input("Coin: ")
-	send_alert(coin1)
 	
 	
+	data = asyncio.get_event_loop().run_until_complete(coin_price_1(coin))
+	price = json.loads(data)
+	price = price["c"]
+	price = float(price)
+
+
+	while price <= alarm_price:
+		taking_price(coin)
+
+		if price >= alarm_price:
+			print(coin.capitalize()+' price: ', price)
+			price_text = coin.capitalize()+' is '+str(price)
+			send_email(sender, receiver, sender_password, price_text)
 	
-	
-	
-	key = input("do you want to exit? (y/n)")
-	
+	while price >= alarm_price:
+		taking_price(coin)
+		
+		if price <= alarm_price:
+			print(coin.capitalize()+' price: ', price)
+			price_text = coin.capitalize()+' is '+str(price)
+			send_email(sender, receiver, sender_password, price_text)
 
+while True:
+  coin = input("Coin: ")
+  alarm_price = float(input("Alarm: "))
+  
+  
+  send_alert(coin)
 
-
-
-
-
-
-
-
-
-
-
+  
 
 
 
