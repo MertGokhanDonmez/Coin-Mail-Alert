@@ -21,9 +21,9 @@ import asyncio
 
 
 
-receiver = 'kriptomesaj@gmail.com'
-sender = 'kriptomesaj@gmail.com'
-sender_password = 'kriptomesaj35'
+receiver = 'anyMail.com'
+sender = 'yourMail.com'
+sender_password = ''
 
 def send_email(sender, receiver, sender_password, text_price):
   msg = MM()
